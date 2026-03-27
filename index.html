@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RK Media | Visual Storytellers & Growth Partners</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lucide@0.383.0/dist/umd/lucide.min.js"></script>
+<style>
+  :root { --red: #D32F2F; --bg: #050505; }
+  * { box-sizing: border-box; }
+  body { font-family: 'Space Grotesk', sans-serif; background: var(--bg); color: #fff; overflow-x: hidden; margin: 0; }
+  h1,h2,h3,h4,.syne { font-family: 'Syne', sans-serif; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #000; }
+  ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+
+  /* horizontal scroll row */
+  .hrow { display: flex; overflow-x: auto; gap: 20px; padding-bottom: 12px; scroll-snap-type: x mandatory; -ms-overflow-style: none; scrollbar-width: none; }
+  .hrow::-webkit-scrollbar { display: none; }
+
+  /* service card */
+  .svc-card { flex: 0 0 300px; min-height: 290px; background: #111; border: 1px solid #2a2a2a; border-radius: 14px; padding: 28px; display: flex; flex-direction: column; cursor: pointer; position: relative; overflow: hidden; transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease; scroll-snap-align: start; }
+  .svc-card:hover { transform: translateY(-8px); border-color: var(--red); box-shadow: 0 20px 40px -10px rgba(211,47,47,0.3); }
+  .svc-icon-bg { width: 48px; height: 48px; background: #2a2a2a; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; flex-shrink: 0; transition: background 0.3s; }
+  .svc-card:hover .svc-icon-bg { background: var(--red); }
+  .svc-ghost { position: absolute; top: 0; right: 0; padding: 12px; opacity: 0.07; pointer-events: none; transition: opacity 0.3s; }
+  .svc-card:hover .svc-ghost { opacity: 0.15; }
+  .svc-title { font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; color: #fff; }
+  .svc-desc { font-size: 0.82rem; color: #9ca3af; line-height: 1.6; flex: 1; margin-bottom: 16px; }
+  .svc-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+  .svc-list li { font-size: 0.75rem; color: #6b7280; font-family: monospace; display: flex; align-items: center; gap: 8px; }
+  .svc-dot { width: 5px; height: 5px; background: var(--red); border-radius: 50%; flex-shrink: 0; }
+
+  /* work card */
+  .work-card { flex: 0 0 min(85vw, 520px); scroll-snap-align: start; position: relative; border-radius: 14px; overflow: hidden; cursor: pointer; display: block; text-decoration: none; color: #fff; }
+  .work-card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; transition: transform 0.6s ease, opacity 0.4s; opacity: 0.8; }
+  .work-card:hover img { transform: scale(1.05); opacity: 1; }
+  .work-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 55%); }
+  .work-play { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+  .play-circle { width: 60px; height: 60px; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.3s, transform 0.3s; }
+  .work-card:hover .play-circle { background: var(--red); transform: scale(1.12); border-color: var(--red); }
+  .work-info { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px 22px; }
+  .work-cat { font-size: 0.7rem; color: #ef4444; font-family: monospace; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+  .work-title { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 700; }
+  .work-dur { position: absolute; bottom: 20px; right: 20px; font-family: monospace; font-size: 0.7rem; color: #aaa; background: rgba(0,0,0,0.6); padding: 3px 8px; border-radius: 4px; }
+  /* CTA card */
+  .cta-card { flex: 0 0 min(85vw, 520px); scroll-snap-align: start; border: 2px dashed rgba(211,47,47,0.3); border-radius: 14px; aspect-ratio: 16/9; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-decoration: none; color: #fff; background: rgba(211,47,47,0.04); transition: border-color 0.3s, background 0.3s; }
+  .cta-card:hover { border-color: var(--red); background: rgba(211,47,47,0.09); }
+  .cta-icon { width: 60px; height: 60px; border-radius: 50%; border: 1px solid rgba(211,47,47,0.4); background: rgba(211,47,47,0.08); display: flex; align-items: center; justify-content: center; transition: background 0.3s; }
+  .cta-card:hover .cta-icon { background: var(--red); }
+
+  /* client logo */
+  .logo-card { flex: 0 0 160px; height: 80px; background: #1a1a1a; border: 1px solid #222; border-radius: 12px; display: flex; align-items: center; justify-content: center; padding: 12px; cursor: pointer; scroll-snap-align: start; transition: border-color 0.3s, background 0.3s; }
+  .logo-card:hover { border-color: var(--red); background: rgba(211,47,47,0.07); }
+  .logo-text { color: #555; font-weight: 700; font-size: 12px; letter-spacing: 2px; text-align: center; transition: color 0.3s; }
+  .logo-card:hover .logo-text { color: var(--red); }
+  .logo-card img { max-width: 100%; max-height: 100%; object-fit: contain; filter: grayscale(1) brightness(0.6); transition: filter 0.3s; }
+  .logo-card:hover img { filter: none; }
+
+  /* founder card */
+  .founder-card { flex: 0 0 300px; scroll-snap-align: start; }
+  @media(min-width:768px) { .founder-card { flex: 0 0 400px; } }
+  .founder-photo { position: relative; border-radius: 16px; overflow: hidden; aspect-ratio: 3/4; background: #1a1a1a; }
+  .founder-photo img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1); transition: filter 0.5s, transform 0.5s; }
+  .founder-card:hover .founder-photo img { filter: none; transform: scale(1.04); }
+  .founder-photo-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%); }
+  .founder-socials { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px; display: flex; gap: 10px; transform: translateY(8px); opacity: 0; transition: transform 0.3s, opacity 0.3s; }
+  .founder-card:hover .founder-socials { transform: translateY(0); opacity: 1; }
+  .social-btn { width: 36px; height: 36px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; color: #fff; transition: background 0.2s; }
+  .social-btn:hover { background: var(--red); }
+
+  /* testimonial card */
+  .testi-card { flex: 0 0 320px; background: #111; border: 1px solid #222; border-radius: 16px; padding: 28px; position: relative; scroll-snap-align: start; display: flex; flex-direction: column; transition: border-color 0.3s; }
+  .testi-card:hover { border-color: rgba(211,47,47,0.4); }
+  @media(min-width:768px) { .testi-card { flex: 0 0 380px; } }
+
+  /* scroll nav */
+  .nav-btn { width: 40px; height: 40px; border: 1px solid #333; border-radius: 50%; background: transparent; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s, color 0.2s; flex-shrink: 0; }
+  .nav-btn:hover { background: #fff; color: #000; }
+
+  /* marquee */
+  .marquee-wrap { overflow: hidden; white-space: nowrap; }
+  .marquee-inner { display: inline-block; animation: mq 25s linear infinite; }
+  @keyframes mq { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* glitch */
+  .glitch { position: relative; }
+  .glitch::before,.glitch::after { content: attr(data-text); position: absolute; top:0; left:0; width:100%; height:100%; background:var(--bg); }
+  .glitch::before { left:2px; text-shadow:-1px 0 #ff00c1; clip:rect(44px,450px,56px,0); animation:ga 5s infinite linear alternate-reverse; }
+  .glitch::after  { left:-2px; text-shadow:-1px 0 #00fff9; clip:rect(44px,450px,56px,0); animation:ga2 5s infinite linear alternate-reverse; }
+  @keyframes ga  { 0%{clip:rect(30px,9999px,10px,0)} 20%{clip:rect(80px,9999px,90px,0)} 40%{clip:rect(10px,9999px,50px,0)} 60%{clip:rect(40px,9999px,20px,0)} 80%{clip:rect(70px,9999px,60px,0)} 100%{clip:rect(20px,9999px,80px,0)} }
+  @keyframes ga2 { 0%{clip:rect(10px,9999px,80px,0)} 20%{clip:rect(60px,9999px,10px,0)} 40%{clip:rect(30px,9999px,50px,0)} 60%{clip:rect(90px,9999px,20px,0)} 80%{clip:rect(10px,9999px,60px,0)} 100%{clip:rect(50px,9999px,30px,0)} }
+
+  /* float */
+  .float { animation: fl 6s ease-in-out infinite; }
+  @keyframes fl { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-18px)} }
+
+  /* misc */
+  .type-cursor { display:inline-block; width:3px; height:0.9em; background:var(--red); margin-left:2px; animation:blink 1s infinite; vertical-align: middle; }
+  @keyframes blink { 0%,50%{opacity:1} 51%,100%{opacity:0} }
+  .text-outline { -webkit-text-stroke:1px rgba(211,47,47,0.5); color:transparent; }
+  .text-glow { text-shadow:0 0 20px rgba(211,47,47,0.5); }
+  .grid-bg { background-image:linear-gradient(rgba(211,47,47,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(211,47,47,0.03) 1px,transparent 1px); background-size:50px 50px; }
+  @keyframes gridMove { from{transform:translate(0,0)} to{transform:translate(100px,100px)} }
+  .section-head { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:2rem; flex-wrap:wrap; gap:1rem; }
+  .noise { position:fixed; inset:0; pointer-events:none; z-index:9000; opacity:0.04; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-size:200px; }
+  .cursor-dot,.cursor-ring { position:fixed; top:0; left:0; transform:translate(-50%,-50%); border-radius:50%; z-index:9999; pointer-events:none; }
+  .cursor-dot { width:7px; height:7px; background:#fff; }
+  .cursor-ring { width:38px; height:38px; border:1px solid rgba(255,255,255,0.4); transition:width .2s,height .2s; }
+</style>
+</head>
+<body>
+
+<div class="noise"></div>
+<div class="cursor-dot hidden md:block"></div>
+<div class="cursor-ring hidden md:block"></div>
+
+<!-- ═══════════════════ NAV ═══════════════════ -->
+<nav id="navbar" style="position:fixed;width:100%;top:0;z-index:50;padding:20px 24px;transition:all .3s;">
+  <div style="max-width:1280px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;">
+    <a href="#" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:#fff;font-family:'Syne',sans-serif;font-size:1.25rem;font-weight:700;">
+      <div style="width:32px;height:32px;background:var(--red);border-radius:4px;display:flex;align-items:center;justify-content:center;transition:transform .3s;" class="logo-box">R</div>
+      RK MEDIA
+    </a>
+    <div class="hidden md:flex" style="gap:32px;align-items:center;">
+      <a href="#services" style="color:#fff;text-decoration:none;font-size:.8rem;letter-spacing:.15em;text-transform:uppercase;opacity:.8;transition:opacity .2s;">Services</a>
+      <a href="#work"     style="color:#fff;text-decoration:none;font-size:.8rem;letter-spacing:.15em;text-transform:uppercase;opacity:.8;transition:opacity .2s;">Work</a>
+      <a href="#founders" style="color:#fff;text-decoration:none;font-size:.8rem;letter-spacing:.15em;text-transform:uppercase;opacity:.8;transition:opacity .2s;">Founders</a>
+      <a href="#contact"  style="color:#fff;text-decoration:none;font-size:.8rem;border:1px solid rgba(255,255,255,0.6);padding:8px 18px;transition:all .2s;">Start Project</a>
+    </div>
+    <button id="mob-btn" class="md:hidden" style="background:none;border:none;color:#fff;cursor:pointer;"><i data-lucide="menu" style="width:28px;height:28px;"></i></button>
+  </div>
+</nav>
+
+<!-- Mobile menu -->
+<div id="mob-menu" style="position:fixed;inset:0;background:#000;z-index:40;transform:translateX(100%);transition:transform .3s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:36px;">
+  <a href="#services" class="mob-link" style="color:#fff;font-family:'Syne',sans-serif;font-size:1.8rem;text-decoration:none;">Services</a>
+  <a href="#work"     class="mob-link" style="color:#fff;font-family:'Syne',sans-serif;font-size:1.8rem;text-decoration:none;">Work</a>
+  <a href="#founders" class="mob-link" style="color:#fff;font-family:'Syne',sans-serif;font-size:1.8rem;text-decoration:none;">Founders</a>
+  <a href="#contact"  class="mob-link" style="color:var(--red);font-family:'Syne',sans-serif;font-size:1.8rem;text-decoration:none;">Contact</a>
+  <button id="mob-close" style="position:absolute;top:24px;right:24px;background:none;border:none;color:#fff;cursor:pointer;"><i data-lucide="x" style="width:36px;height:36px;"></i></button>
+</div>
+
+<!-- ═══════════════════ HERO ═══════════════════ -->
+<section style="min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;padding-top:80px;position:relative;" class="grid-bg">
+  <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.8),rgba(0,0,0,.9),#050505);z-index:1;"></div>
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(211,47,47,.1) 1px,transparent 1px),linear-gradient(90deg,rgba(211,47,47,.1) 1px,transparent 1px);background-size:100px 100px;animation:gridMove 20s linear infinite;"></div>
+
+  <!-- floating words -->
+  <div style="position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1;">
+    <div class="float text-outline" style="position:absolute;top:80px;left:40px;font-size:3.5rem;font-family:'Syne',sans-serif;font-weight:900;opacity:.18;animation-delay:0s;">BRAND</div>
+    <div class="float" style="position:absolute;top:140px;right:80px;font-size:2rem;font-family:'Syne',sans-serif;font-weight:700;color:rgba(127,29,29,.4);animation-delay:1s;">GROWTH</div>
+    <div class="float text-outline" style="position:absolute;bottom:160px;left:80px;font-size:2.8rem;font-family:'Syne',sans-serif;font-weight:900;opacity:.12;animation-delay:2s;">CONTENT</div>
+    <div class="float" style="position:absolute;top:35%;left:22%;font-size:1.8rem;font-family:'Syne',sans-serif;font-weight:700;color:rgba(211,47,47,.18);animation-delay:1.5s;">VIRAL</div>
+    <div class="float text-outline" style="position:absolute;bottom:80px;right:40px;font-size:4rem;font-family:'Syne',sans-serif;font-weight:900;opacity:.08;animation-delay:.5s;">IMPACT</div>
+    <div class="float text-outline" style="position:absolute;bottom:35%;left:40px;font-size:2.2rem;font-family:'Syne',sans-serif;font-weight:900;opacity:.15;animation-delay:3s;">STORY</div>
+  </div>
+
+  <div style="position:relative;z-index:2;max-width:1280px;margin:0 auto;padding:0 24px;text-align:center;">
+    <div style="margin-bottom:32px;">
+      <span style="display:inline-flex;align-items:center;gap:8px;padding:8px 18px;border:1px solid rgba(211,47,47,.5);border-radius:100px;background:rgba(127,29,29,.1);">
+        <span style="width:8px;height:8px;background:var(--red);border-radius:50%;animation:blink 1s infinite;display:inline-block;"></span>
+        <span style="font-size:.7rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#ef4444;">Transforming Ideas Into Impact</span>
+      </span>
+    </div>
+
+    <h1 class="glitch syne" data-text="WE CREATE" style="font-size:clamp(3rem,12vw,8rem);font-weight:900;line-height:1;letter-spacing:-.03em;margin-bottom:20px;">
+      <span id="type-el"></span><span class="type-cursor"></span>
+    </h1>
+
+    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:20px;font-family:'Syne',sans-serif;font-size:clamp(1.4rem,4vw,3rem);font-weight:700;margin-bottom:16px;">
+      <span class="text-glow" style="color:var(--red);">BRANDS</span>
+      <span>THAT</span>
+      <span class="text-glow" style="color:var(--red);">SPEAK</span>
+    </div>
+
+    <div style="font-size:clamp(1rem,2.5vw,1.6rem);color:#9ca3af;margin-bottom:40px;min-height:2em;">
+      <span id="scramble-el">Marketing</span>
+    </div>
+
+    <!-- stats -->
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;max-width:700px;margin:0 auto 40px;">
+      <div style="background:rgba(0,0,0,.5);border:1px solid rgba(127,29,29,.3);padding:16px;border-radius:10px;">
+        <div style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:900;color:var(--red);">500+</div>
+        <div style="font-size:.7rem;color:#9ca3af;text-transform:uppercase;letter-spacing:.1em;">Projects</div>
+      </div>
+      <div style="background:rgba(0,0,0,.5);border:1px solid rgba(127,29,29,.3);padding:16px;border-radius:10px;">
+        <div style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:900;color:var(--red);">50M+</div>
+        <div style="font-size:.7rem;color:#9ca3af;text-transform:uppercase;letter-spacing:.1em;">Views Generated</div>
+      </div>
+      <div style="background:rgba(0,0,0,.5);border:1px solid rgba(127,29,29,.3);padding:16px;border-radius:10px;">
+        <div style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:900;color:var(--red);">98%</div>
+        <div style="font-size:.7rem;color:#9ca3af;text-transform:uppercase;letter-spacing:.1em;">Client Retention</div>
+      </div>
+      <div style="background:rgba(0,0,0,.5);border:1px solid rgba(127,29,29,.3);padding:16px;border-radius:10px;">
+        <div style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:900;color:var(--red);">10x</div>
+        <div style="font-size:.7rem;color:#9ca3af;text-transform:uppercase;letter-spacing:.1em;">Average ROI</div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:16px;">
+      <a href="#work" style="display:inline-flex;align-items:center;gap:8px;background:var(--red);color:#fff;padding:14px 28px;font-weight:700;text-decoration:none;border-radius:2px;transition:opacity .2s;">
+        View Our Work <i data-lucide="arrow-right" style="width:16px;height:16px;"></i>
+      </a>
+      <a href="#services" style="display:inline-flex;align-items:center;padding:14px 28px;border:1px solid rgba(255,255,255,.25);color:#fff;text-decoration:none;border-radius:2px;transition:border-color .2s;">
+        Explore Services
+      </a>
+    </div>
+  </div>
+
+  <div style="position:absolute;bottom:36px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;opacity:.4;animation:fl 2s ease-in-out infinite;">
+    <span style="font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;">Scroll</span>
+    <i data-lucide="chevron-down" style="width:18px;height:18px;"></i>
+  </div>
+</section>
+
+<!-- ═══════════════════ MARQUEE ═══════════════════ -->
+<div style="background:var(--red);padding:12px 0;overflow:hidden;transform:rotate(1deg) scaleX(1.05);border-top:2px solid #000;border-bottom:2px solid #000;">
+  <div class="marquee-wrap">
+    <div class="marquee-inner" style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:900;color:#000;text-transform:uppercase;letter-spacing:-.02em;">
+      Video Production &bull; Social Media Management &bull; Performance Marketing &bull; Brand Strategy &bull; Wedding Edits &bull; Commercials &bull; Content Creation &bull; Website Development &bull;&nbsp;
+      Video Production &bull; Social Media Management &bull; Performance Marketing &bull; Brand Strategy &bull; Wedding Edits &bull; Commercials &bull; Content Creation &bull; Website Development &bull;&nbsp;
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ SERVICES ═══════════════════ -->
+<section id="services" style="padding:80px 0;background:#050505;">
+  <div style="max-width:1280px;margin:0 auto;padding:0 24px;">
+    <div class="section-head">
+      <div>
+        <p style="font-size:.75rem;font-weight:700;color:var(--red);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;">What We Do</p>
+        <h2 class="syne" style="font-size:clamp(2rem,5vw,3.5rem);font-weight:700;line-height:1.1;margin:0;">Full Stack<br>Creativity</h2>
+      </div>
+      <div style="display:flex;align-items:flex-end;gap:12px;">
+        <p style="color:#6b7280;font-size:.85rem;max-width:240px;display:none;" class="md:block">We handle the entire pipeline. From first frame to final click.</p>
+        <div style="display:flex;gap:8px;">
+          <button class="nav-btn" onclick="scrollRow('svc-row',-1)"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i></button>
+          <button class="nav-btn" onclick="scrollRow('svc-row', 1)"><i data-lucide="arrow-right" style="width:16px;height:16px;"></i></button>
+        </div>
+      </div>
+    </div>
+
+    <div id="svc-row" class="hrow">
+
+      <!-- ── VIDEO PRODUCTION ── -->
+      <div class="svc-card">
+        <div class="svc-ghost"><svg width="80" height="80" fill="none" stroke="#D32F2F" stroke-width="1.5" viewBox="0 0 24 24"><path d="m15 10 4.553-2.07A1 1 0 0 1 21 8.845v6.31a1 1 0 0 1-1.447.915L15 14M3 8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg></div>
+        <div class="svc-icon-bg"><svg width="22" height="22" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><path d="m15 10 4.553-2.07A1 1 0 0 1 21 8.845v6.31a1 1 0 0 1-1.447.915L15 14M3 8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg></div>
+        <div class="svc-title">Video Production</div>
+        <p class="svc-desc">High-impact commercials, brand stories, and creator content. Shot in 4K/8K with cinema-grade equipment.</p>
+        <ul class="svc-list">
+          <li><span class="svc-dot"></span>Commercials</li>
+          <li><span class="svc-dot"></span>Content Creators</li>
+          <li><span class="svc-dot"></span>Product Demos</li>
+        </ul>
+      </div>
+
+      <!-- ── POST PRODUCTION ── -->
+      <div class="svc-card">
+        <div class="svc-ghost"><svg width="80" height="80" fill="none" stroke="#D32F2F" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><path d="M8.12 8.12 12 12m0 0 3.88 3.88M12 12l3.88-3.88M12 12 8.12 15.88"/><circle cx="18" cy="18" r="3"/></svg></div>
+        <div class="svc-icon-bg"><svg width="22" height="22" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><path d="M8.12 8.12 12 12m0 0 3.88 3.88M12 12l3.88-3.88M12 12 8.12 15.88"/><circle cx="18" cy="18" r="3"/></svg></div>
+        <div class="svc-title">Post Production</div>
+        <p class="svc-desc">Color grading that pops, sound design that immerses, and cuts that keep eyes glued to the screen.</p>
+        <ul class="svc-list">
+          <li><span class="svc-dot"></span>Wedding Films</li>
+          <li><span class="svc-dot"></span>Event Recaps</li>
+          <li><span class="svc-dot"></span>VFX &amp; Motion Graphics</li>
+        </ul>
+      </div>
+
+      <!-- ── SOCIAL MEDIA ── -->
+      <div class="svc-card">
+        <div class="svc-ghost"><svg width="80" height="80" fill="none" stroke="#D32F2F" stroke-width="1.5" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
+        <div class="svc-icon-bg"><svg width="22" height="22" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
+        <div class="svc-title">Social Media</div>
+        <p class="svc-desc">We speak fluent algorithm. Managing your pages, creating thumb-stopping content, and building community.</p>
+        <ul class="svc-list">
+          <li><span class="svc-dot"></span>Page Management</li>
+          <li><span class="svc-dot"></span>Reels / TikTok Strategy</li>
+          <li><span class="svc-dot"></span>Copywriting</li>
+        </ul>
+      </div>
+
+      <!-- ── PERFORMANCE MARKETING ── -->
+      <div class="svc-card">
+        <div class="svc-ghost"><svg width="80" height="80" fill="none" stroke="#D32F2F" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
+        <div class="svc-icon-bg"><svg width="22" height="22" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
+        <div class="svc-title">Performance Marketing</div>
+        <p class="svc-desc">Data-driven ad campaigns optimised for ROAS, not just likes. Google, Meta and LinkedIn experts.</p>
+        <ul class="svc-list">
+          <li><span class="svc-dot"></span>Ad Creative</li>
+          <li><span class="svc-dot"></span>Media Buying</li>
+          <li><span class="svc-dot"></span>Analytics</li>
+        </ul>
+      </div>
+
+      <!-- ── WEB DEVELOPMENT ── -->
+      <div class="svc-card">
+        <div class="svc-ghost"><svg width="80" height="80" fill="none" stroke="#D32F2F" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+        <div class="svc-icon-bg"><svg width="22" height="22" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+        <div class="svc-title">Web Development</div>
+        <p class="svc-desc">Digital storefronts that convert. Fast, responsive, stunning websites using React and Webflow.</p>
+        <ul class="svc-list">
+          <li><span class="svc-dot"></span>Landing Pages</li>
+          <li><span class="svc-dot"></span>E-commerce</li>
+          <li><span class="svc-dot"></span>Portfolio Sites</li>
+        </ul>
+      </div>
+
+      <!-- ── PHOTOGRAPHY ── -->
+      <div class="svc-card">
+        <div class="svc-ghost"><svg width="80" height="80" fill="none" stroke="#D32F2F" stroke-width="1.5" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+        <div class="svc-icon-bg"><svg width="22" height="22" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+        <div class="svc-title">Photography</div>
+        <p class="svc-desc">Product shoots, brand campaigns, and event photography that tell your story visually and powerfully.</p>
+        <ul class="svc-list">
+          <li><span class="svc-dot"></span>Product Photography</li>
+          <li><span class="svc-dot"></span>Brand Shoots</li>
+          <li><span class="svc-dot"></span>Event Coverage</li>
+        </ul>
+      </div>
+
+    </div><!-- end svc-row -->
+  </div>
+</section>
+
+<!-- ═══════════════════ WORK ═══════════════════ -->
+<section id="work" style="padding:80px 0;background:#000;">
+  <div style="max-width:1280px;margin:0 auto;padding:0 24px 24px;">
+    <div class="section-head">
+      <h2 class="syne" style="font-size:clamp(2rem,5vw,3.5rem);font-weight:700;line-height:1.1;margin:0;">Selected<br><span style="color:var(--red);">Works</span></h2>
+      <div style="display:flex;gap:8px;">
+        <button class="nav-btn" onclick="scrollRow('work-row',-1)"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i></button>
+        <button class="nav-btn" onclick="scrollRow('work-row', 1)"><i data-lucide="arrow-right" style="width:16px;height:16px;"></i></button>
+      </div>
+    </div>
+  </div>
+  <div id="work-row" class="hrow" style="padding:0 24px 24px;">
+
+    <!-- ADD YOUR WORK THUMBNAILS HERE — change src= to your image path -->
+    <a href="portfolio.html" class="work-card">
+      <img src="https://images.unsplash.com/photo-1600607686527-6fb886090705?q=80&w=1200&auto=format&fit=crop" alt="Neon Nights">
+      <div class="work-overlay"></div>
+      <div class="work-play"><div class="play-circle"><svg width="24" height="24" fill="#fff" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div></div>
+      <div class="work-info">
+        <div class="work-cat">Commercial</div>
+        <div class="work-title">Neon Nights</div>
+      </div>
+      <div class="work-dur">2:35</div>
+    </a>
+
+    <a href="portfolio.html" class="work-card">
+      <img src="https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1200&auto=format&fit=crop" alt="The Royal Affair">
+      <div class="work-overlay"></div>
+      <div class="work-play"><div class="play-circle"><svg width="24" height="24" fill="#fff" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div></div>
+      <div class="work-info">
+        <div class="work-cat">Wedding</div>
+        <div class="work-title">The Royal Affair</div>
+      </div>
+      <div class="work-dur">4:12</div>
+    </a>
+
+    <a href="portfolio.html" class="work-card">
+      <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1200&auto=format&fit=crop" alt="Tech Noir">
+      <div class="work-overlay"></div>
+      <div class="work-play"><div class="play-circle"><svg width="24" height="24" fill="#fff" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div></div>
+      <div class="work-info">
+        <div class="work-cat">Brand Film</div>
+        <div class="work-title">Tech Noir</div>
+      </div>
+      <div class="work-dur">1:48</div>
+    </a>
+
+    <a href="portfolio.html" class="work-card">
+      <img src="https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?q=80&w=1200&auto=format&fit=crop" alt="Urban Pulse">
+      <div class="work-overlay"></div>
+      <div class="work-play"><div class="play-circle"><svg width="24" height="24" fill="#fff" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div></div>
+      <div class="work-info">
+        <div class="work-cat">Social Media</div>
+        <div class="work-title">Urban Pulse</div>
+      </div>
+      <div class="work-dur">0:45</div>
+    </a>
+
+    <!-- CTA card -->
+    <a href="portfolio.html" class="cta-card">
+      <div class="cta-icon"><svg width="26" height="26" fill="none" stroke="#D32F2F" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="m10 8 6 4-6 4V8z"/></svg></div>
+      <div style="text-align:center;padding:0 24px;">
+        <div class="syne" style="font-size:1.4rem;font-weight:700;margin-bottom:6px;">See Full Portfolio</div>
+        <div style="font-size:.82rem;color:#6b7280;">All our video productions in one place</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;color:var(--red);font-weight:700;font-size:.82rem;">
+        Watch All Videos <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </div>
+    </a>
+
+  </div>
+</section>
+
+<!-- ═══════════════════ CLIENTS ═══════════════════ -->
+<!-- ══════════════════════════════════════════════════
+     ADD YOUR CLIENT LOGOS HERE
+     Replace logo="" with your image path e.g. "images/clients/logo1.png"
+     If logo="" is empty, client name text shows instead
+     ══════════════════════════════════════════════════ -->
+<section style="padding:60px 0;background:#0a0a0a;border-top:1px solid #111;border-bottom:1px solid #111;">
+  <div style="max-width:1280px;margin:0 auto;padding:0 24px;">
+    <div class="section-head">
+      <div>
+        <p style="font-size:.7rem;color:#6b7280;letter-spacing:.15em;text-transform:uppercase;margin-bottom:6px;">Trusted By Innovators</p>
+        <h3 class="syne" style="font-size:clamp(1.4rem,3vw,2rem);font-weight:700;margin:0;">Our Clients</h3>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="nav-btn" onclick="scrollRow('clients-row',-1)"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i></button>
+        <button class="nav-btn" onclick="scrollRow('clients-row', 1)"><i data-lucide="arrow-right" style="width:16px;height:16px;"></i></button>
+      </div>
+    </div>
+    <div id="clients-row" class="hrow" style="padding-bottom:8px;" id="clients-row"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════ FOUNDERS ═══════════════════ -->
+<section id="founders" style="padding:80px 0;background:#050505;position:relative;overflow:hidden;">
+  <div style="position:absolute;top:0;right:0;width:50%;height:100%;background:linear-gradient(to left,rgba(127,29,29,.08),transparent);pointer-events:none;"></div>
+  <div style="max-width:1280px;margin:0 auto;padding:0 24px;position:relative;">
+    <div class="section-head">
+      <div>
+        <p style="font-size:.75rem;font-weight:700;color:var(--red);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;">The Minds</p>
+        <h2 class="syne" style="font-size:clamp(2rem,5vw,3.5rem);font-weight:700;line-height:1.1;margin:0;">Meet The<br>Founders</h2>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="nav-btn" onclick="scrollRow('founders-row',-1)"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i></button>
+        <button class="nav-btn" onclick="scrollRow('founders-row', 1)"><i data-lucide="arrow-right" style="width:16px;height:16px;"></i></button>
+      </div>
+    </div>
+    <div id="founders-row" class="hrow" style="padding-bottom:8px;"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════ TESTIMONIALS ═══════════════════ -->
+<section style="padding:80px 0;background:#0a0a0a;">
+  <div style="max-width:1280px;margin:0 auto;padding:0 24px;">
+    <div class="section-head">
+      <h2 class="syne" style="font-size:clamp(2rem,4vw,3rem);font-weight:700;margin:0;">Client Love</h2>
+      <div style="display:flex;gap:8px;">
+        <button class="nav-btn" onclick="scrollRow('testi-row',-1)"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i></button>
+        <button class="nav-btn" onclick="scrollRow('testi-row', 1)"><i data-lucide="arrow-right" style="width:16px;height:16px;"></i></button>
+      </div>
+    </div>
+    <div id="testi-row" class="hrow" style="padding-bottom:8px;"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<footer id="contact" style="background:#000;padding:80px 0 40px;border-top:1px solid #111;">
+  <div style="max-width:1280px;margin:0 auto;padding:0 24px;">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:48px;margin-bottom:60px;">
+      <div style="grid-column:span 2;">
+        <div class="syne" style="font-size:1.6rem;font-weight:700;display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+          <div style="width:36px;height:36px;background:var(--red);border-radius:4px;display:flex;align-items:center;justify-content:center;">R</div>
+          RK MEDIA
+        </div>
+        <p style="color:#6b7280;max-width:320px;line-height:1.7;margin-bottom:24px;font-size:.9rem;">Creating visual narratives that captivate, engage, and convert. Your story deserves the cinema treatment.</p>
+        <div style="display:flex;gap:12px;">
+          <a href="#" style="width:40px;height:40px;background:#111;border-radius:50%;display:flex;align-items:center;justify-content:center;text-decoration:none;color:#fff;transition:background .2s;" onmouseover="this.style.background='#D32F2F'" onmouseout="this.style.background='#111'"><i data-lucide="instagram" style="width:18px;height:18px;"></i></a>
+          <a href="#" style="width:40px;height:40px;background:#111;border-radius:50%;display:flex;align-items:center;justify-content:center;text-decoration:none;color:#fff;transition:background .2s;" onmouseover="this.style.background='#D32F2F'" onmouseout="this.style.background='#111'"><i data-lucide="youtube" style="width:18px;height:18px;"></i></a>
+          <a href="#" style="width:40px;height:40px;background:#111;border-radius:50%;display:flex;align-items:center;justify-content:center;text-decoration:none;color:#fff;transition:background .2s;" onmouseover="this.style.background='#D32F2F'" onmouseout="this.style.background='#111'"><i data-lucide="linkedin" style="width:18px;height:18px;"></i></a>
+          <a href="#" style="width:40px;height:40px;background:#111;border-radius:50%;display:flex;align-items:center;justify-content:center;text-decoration:none;color:#fff;transition:background .2s;" onmouseover="this.style.background='#D32F2F'" onmouseout="this.style.background='#111'"><i data-lucide="twitter" style="width:18px;height:18px;"></i></a>
+        </div>
+      </div>
+      <div>
+        <h4 style="font-weight:700;margin-bottom:20px;">Contact</h4>
+        <div style="display:flex;flex-direction:column;gap:14px;color:#9ca3af;font-size:.9rem;">
+          <a href="mailto:hello@rkmedia.com" style="color:#9ca3af;text-decoration:none;display:flex;align-items:center;gap:10px;"><i data-lucide="mail" style="width:16px;height:16px;color:var(--red);flex-shrink:0;"></i>hello@rkmedia.com</a>
+          <a href="tel:+919876543210"        style="color:#9ca3af;text-decoration:none;display:flex;align-items:center;gap:10px;"><i data-lucide="phone" style="width:16px;height:16px;color:var(--red);flex-shrink:0;"></i>+91 98765 43210</a>
+          <span style="display:flex;align-items:flex-start;gap:10px;"><i data-lucide="map-pin" style="width:16px;height:16px;color:var(--red);flex-shrink:0;margin-top:2px;"></i>Hyderabad, India</span>
+        </div>
+      </div>
+      <div>
+        <h4 style="font-weight:700;margin-bottom:20px;">Quick Links</h4>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <a href="#services"      style="color:#9ca3af;text-decoration:none;font-size:.9rem;transition:color .2s;" onmouseover="this.style.color='#D32F2F'" onmouseout="this.style.color='#9ca3af'">Services</a>
+          <a href="#work"          style="color:#9ca3af;text-decoration:none;font-size:.9rem;transition:color .2s;" onmouseover="this.style.color='#D32F2F'" onmouseout="this.style.color='#9ca3af'">Portfolio</a>
+          <a href="#founders"      style="color:#9ca3af;text-decoration:none;font-size:.9rem;transition:color .2s;" onmouseover="this.style.color='#D32F2F'" onmouseout="this.style.color='#9ca3af'">About Us</a>
+          <a href="portfolio.html" style="color:#9ca3af;text-decoration:none;font-size:.9rem;transition:color .2s;" onmouseover="this.style.color='#D32F2F'" onmouseout="this.style.color='#9ca3af'">Video Portfolio</a>
+          <a href="#"              style="color:#9ca3af;text-decoration:none;font-size:.9rem;transition:color .2s;" onmouseover="this.style.color='#D32F2F'" onmouseout="this.style.color='#9ca3af'">Privacy Policy</a>
+        </div>
+      </div>
+    </div>
+    <div style="border-top:1px solid #111;padding-top:28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+      <p style="color:#4b5563;font-size:.8rem;margin:0;">&copy; 2024 RK Media. All rights reserved.</p>
+      <p style="color:#4b5563;font-size:.8rem;margin:0;">Made with ❤️ in Hyderabad</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ════════════════════════════════════════════════
+   ✏️  EDIT YOUR CONTENT HERE
+   ════════════════════════════════════════════════ */
+
+// ── CLIENTS ──────────────────────────────────────
+// logo: "" = show text name | logo: "images/clients/logo1.png" = show image
+const CLIENTS = [
+  { name: "Client One",   logo: "images/buchibabu.jpg" },
+  { name: "Client Two",   logo: "images/dharmic_minds.jpg" },
+  { name: "Client Eight", logo: "images/bythebottle.jpg" },
+  { name: "Client Six",   logo: "images/pawwa.png" },
+  { name: "Client Seven", logo: "images/naatu.png" },
+  { name: "Client Three", logo: "images/aahwanam.png" },
+  { name: "Client Four",  logo: "images/punyaka.png" },
+  { name: "Client Five",  logo: "images/moksha.png" },
+  
+];
+
+// ── FOUNDERS ─────────────────────────────────────
+// photo: replace URL with your image path e.g. "images/rathan.jpg"
+const FOUNDERS = [
+  {
+    name: "Rathan Guntuka",
+    role: "CREATIVE DIRECTOR",
+    photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=800&auto=format&fit=crop",
+    bio: "Visionary storyteller with an eye for the cinematic. Rathan leads creative direction, ensuring every frame aligns with the brand's core emotion.",
+    instagram: "#", linkedin: "#"
+  },
+  {
+    name: "Karthik Guntuka",
+    role: "SENIOR EDITOR",
+    photo: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=800&auto=format&fit=crop",
+    bio: "The technical wizard behind the cuts. Karthik specialises in high-octane editing, color science, and post-production workflows ready for the big screen.",
+    instagram: "#", linkedin: "#"
+  },
+];
+
+// ── TESTIMONIALS ──────────────────────────────────
+const TESTIMONIALS = [
+  { rating:5, text:"RK Media transformed our product launch. The commercial they produced increased our conversion rate by 150%. Absolute professionals.", author:"Sarah Jenkins", role:"CEO, TechFlow", avatar:"https://randomuser.me/api/portraits/women/44.jpg" },
+  { rating:5, text:"The wedding video was not just a recording, it was a movie. They captured emotions we didn't even know were happening. Highly recommended!", author:"David & Anya", role:"Wedding Clients", avatar:"https://randomuser.me/api/portraits/men/32.jpg" },
+  { rating:5, text:"Managing our social media was a headache until RK Media took over. Engagement has never been higher and content quality is top-tier.", author:"Priya Malhotra", role:"Founder, StyleHub", avatar:"https://randomuser.me/api/portraits/women/68.jpg" },
+  { rating:5, text:"The team at RK Media understand storytelling at a deep level. Our brand film got 2M organic views in the first week.", author:"Arjun Mehta", role:"CMO, NeonCorp", avatar:"https://randomuser.me/api/portraits/men/55.jpg" },
+];
+
+/* ════════════════════════════════════════════════
+   ENGINE — no need to edit below
+   ════════════════════════════════════════════════ */
+
+function scrollRow(id, dir) {
+  const el = document.getElementById(id);
+  el.scrollBy({ left: dir * el.offsetWidth * 0.78, behavior: 'smooth' });
+}
+
+// Render clients
+(function() {
+  const row = document.getElementById('clients-row');
+  if (!row) return;
+  row.innerHTML = CLIENTS.map(c => `
+    <div class="logo-card">
+      ${c.logo ? `<img src="${c.logo}" alt="${c.name}">` : `<span class="logo-text">${c.name}</span>`}
+    </div>
+  `).join('');
+})();
+
+// Render founders
+(function() {
+  const row = document.getElementById('founders-row');
+  if (!row) return;
+  row.innerHTML = FOUNDERS.map(f => `
+    <div class="founder-card">
+      <div class="founder-photo">
+        <img src="${f.photo}" alt="${f.name}" loading="lazy">
+        <div class="founder-photo-overlay"></div>
+        <div class="founder-socials">
+          <a href="${f.instagram}" class="social-btn"><svg width="16" height="16" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+          <a href="${f.linkedin}"  class="social-btn"><svg width="16" height="16" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+        </div>
+      </div>
+      <div style="margin-top:18px;padding-right:12px;">
+        <h4 class="syne" style="font-size:1.4rem;font-weight:700;margin:0 0 4px;">${f.name}</h4>
+        <p style="color:var(--red);font-family:monospace;font-size:.75rem;margin:0 0 12px;">${f.role}</p>
+        <p style="color:#9ca3af;font-size:.85rem;line-height:1.6;margin:0;">${f.bio}</p>
+      </div>
+    </div>
+  `).join('');
+})();
+
+// Render testimonials
+(function() {
+  const row = document.getElementById('testi-row');
+  if (!row) return;
+  const stars = n => Array(n).fill('<svg width="14" height="14" fill="#D32F2F" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>').join('');
+  row.innerHTML = TESTIMONIALS.map(t => `
+    <div class="testi-card">
+      <svg width="36" height="36" fill="none" stroke="rgba(211,47,47,.15)" stroke-width="1.5" viewBox="0 0 24 24" style="position:absolute;top:20px;right:20px;"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>
+      <div style="display:flex;gap:3px;margin-bottom:16px;">${stars(t.rating)}</div>
+      <p style="color:#d1d5db;font-style:italic;line-height:1.7;flex:1;margin:0 0 20px;font-size:.9rem;">"${t.text}"</p>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <img src="${t.avatar}" alt="${t.author}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;" loading="lazy">
+        <div>
+          <div style="font-weight:700;font-size:.85rem;">${t.author}</div>
+          <div style="color:#6b7280;font-size:.75rem;">${t.role}</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+})();
+
+// Lucide icons
+lucide.createIcons();
+
+// Mobile nav
+document.getElementById('mob-btn').onclick   = () => document.getElementById('mob-menu').style.transform = 'translateX(0)';
+document.getElementById('mob-close').onclick = () => document.getElementById('mob-menu').style.transform = 'translateX(100%)';
+document.querySelectorAll('.mob-link').forEach(l => l.addEventListener('click', () => document.getElementById('mob-menu').style.transform = 'translateX(100%)'));
+
+// Sticky nav bg
+window.addEventListener('scroll', () => {
+  const nav = document.getElementById('navbar');
+  nav.style.background = window.scrollY > 60 ? 'rgba(0,0,0,.85)' : 'transparent';
+  nav.style.backdropFilter = window.scrollY > 60 ? 'blur(16px)' : 'none';
+});
+
+// Custom cursor
+const dot  = document.querySelector('.cursor-dot');
+const ring = document.querySelector('.cursor-ring');
+window.addEventListener('mousemove', e => {
+  dot.style.left  = e.clientX + 'px'; dot.style.top  = e.clientY + 'px';
+  ring.animate({ left: e.clientX + 'px', top: e.clientY + 'px' }, { duration:500, fill:'forwards' });
+});
+
+// Typewriter
+const typeEl = document.getElementById('type-el');
+const fullText = 'WE CREATE';
+let i = 0;
+function type() { if (i < fullText.length) { typeEl.textContent += fullText[i++]; setTimeout(type, 100); } }
+setTimeout(type, 600);
+
+// Word scramble
+const chars = '!<>-_\\/[]{}=+*^?#';
+const words = ['Marketing','Digital Growth','Visual Stories','Conversions','Engagement'];
+let wIdx = 0;
+const sEl = document.getElementById('scramble-el');
+function scrambleTo(txt) {
+  let frame = 0;
+  const q = txt.split('').map((to,i) => ({ to, start: Math.floor(Math.random()*20), end: Math.floor(Math.random()*20)+20, char:'' }));
+  function tick() {
+    let out='', done=0;
+    q.forEach(item => {
+      if (frame >= item.end) { out += item.to; done++; }
+      else if (frame >= item.start) { item.char = chars[Math.floor(Math.random()*chars.length)]; out += `<span style="color:var(--red)">${item.char}</span>`; }
+      else out += item.to;
+    });
+    sEl.innerHTML = out;
+    if (done < q.length) { frame++; requestAnimationFrame(tick); }
+    else setTimeout(() => { wIdx = (wIdx+1)%words.length; scrambleTo(words[wIdx]); }, 2200);
+  }
+  tick();
+}
+setTimeout(() => scrambleTo(words[wIdx]), 2000);
+</script>
+</body>
+</html>
